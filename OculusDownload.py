@@ -14,6 +14,7 @@ except ImportError:
     from HTMLParser import HTMLParser
 
 ocDownloadUrl = 'https://www3.oculus.com/en-us/setup/'
+ocHomeUrl = 'https://www.oculus.com'
 ocInstallerConfigUrl = 'https://graph.oculus.com/bootstrap_installer_config'
 ocSetupName = 'OculusSetup.exe'
 ocDownloadCachePath = 'c:\\OculusSetup-DownloadCache'
@@ -29,13 +30,13 @@ class SetupLinkParser(HTMLParser):
         if tag == 'a':
             ocSetupFound = 0
             for name,value in attrs:
-                if name == 'id' and value == 'rift-setup-download-button-link':
+                if name == 'class' and value == '_3hmq _4pg_ _4phe setup-pg-module__download-cta':
                     ocSetupFound = 1
                     break
             if ocSetupFound == 1:
                 for name,value in attrs:
                     if name == 'href':
-                        self.url = value
+                        self.url = ocHomeUrl+value
                         break
     def getUrl(self):
         return self.url
@@ -46,10 +47,11 @@ def AddAccessToken(url):
         urlWToken = url+'?'+ocAccessToken
     else:
         urlWToken = url+'&&'+ocAccessToken
+    print(urlWToken)
     return urlWToken
 
 def RequestInstaller():
-    req = Request(AddAccessToken(ocDownloadUrl))
+    req = Request(ocDownloadUrl)
     req.add_header('User-agent', chromeUserAgent)
     reqRes = urlopen(req)
     return reqRes.read().strip().decode('utf-8')
